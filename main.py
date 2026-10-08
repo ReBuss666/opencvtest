@@ -35,7 +35,7 @@ def main():
         def custom_show():
             plt.savefig(save_path, dpi=300, bbox_inches="tight")
             print(f" [✓] Сохранено: {save_path}")
-            plt.close("all")
+            original_show()
 
         original_show = plt.show
         plt.show = custom_show
