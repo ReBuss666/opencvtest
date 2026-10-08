@@ -1,4 +1,7 @@
+import os
 import argparse
+import matplotlib.pyplot as plt
+
 import zadanie_1, zadanie_2, zadanie_3, zadanie_4, zadanie_5, zadanie_6, zadanie_7
 
 
@@ -12,6 +15,9 @@ def main():
     )
     args = parser.parse_args()
 
+    output_dir = "results"
+    os.makedirs(output_dir, exist_ok=True)
+
     modules = {
         1: zadanie_1,
         2: zadanie_2,
@@ -22,13 +28,29 @@ def main():
         7: zadanie_7,
     }
 
+    def execute_task(task_num, module):
+        print(f"\n--- Running Task {task_num} ---")
+        save_path = os.path.join(output_dir, f"result_task_{task_num}.png")
+
+        def custom_show():
+            plt.savefig(save_path, dpi=300, bbox_inches="tight")
+            print(f" [✓] Сохранено: {save_path}")
+            plt.close("all")
+
+        original_show = plt.show
+        plt.show = custom_show
+
+        try:
+            module.run(args.image)
+        finally:
+            plt.show = original_show
+
     if args.task in modules:
-        modules[args.task].run(args.image)
+        execute_task(args.task, modules[args.task])
     else:
         for idx, mod in modules.items():
-            print(f"\n--- Running Task {idx} ---")
             try:
-                mod.run(args.image)
+                execute_task(idx, mod)
             except Exception as e:
                 print(f"Error on Task {idx}: {e}")
 
